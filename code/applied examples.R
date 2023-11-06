@@ -35,7 +35,7 @@ reg_mle <- glm(ptb ~ anemia + bp, data=dat, family="binomial")
 ests_mle <-as.data.frame(cbind("beta"=reg_mle$coefficients,
                                "se"=sqrt(diag(vcov(reg_mle))))) %>%
   mutate(lcl = beta - 1.96*se,
-         ucl = beta + 1.95*se)
+         ucl = beta + 1.96*se)
 intlist <- row.names(ests_mle)
 
 print("Estimated logistic regression")
@@ -90,7 +90,7 @@ se <- sqrt(diag(sandwich / n))
 ests_mest <-as.data.frame(cbind("beta"=beta_root,
                                 "se"=se)) %>%
   mutate(lcl = beta - 1.96*se,
-         ucl = beta + 1.95*se)
+         ucl = beta + 1.96*se)
 
 row.names(ests_mest) <- intlist
             
@@ -122,7 +122,7 @@ se_geex <- sqrt(diag(vcov(mestr)))    # Extract finite sample variance and take 
 ests_geex <-as.data.frame(cbind("beta"=beta_geex,
                                 "se"=se_geex)) %>%
   mutate(lcl = beta - 1.96*se,
-         ucl = beta + 1.95*se)
+         ucl = beta + 1.96*se)
 
 row.names(ests_geex) <- intlist
 
@@ -184,7 +184,7 @@ se2a <- sqrt(diag(vcov(mest_2a)))
 ests_2a <-as.data.frame(cbind("beta"=theta2a,
                                 "se"=se2a)) %>%
   mutate(lcl = beta - 1.96*se,
-         ucl = beta + 1.95*se)
+         ucl = beta + 1.96*se)
 
 row.names(ests_2a) <- c(intlist,"risk1","risk0","rd","lnrr")
 
@@ -232,7 +232,7 @@ se2b <- sqrt(diag(vcov(mest_2b)))
 ests_2b <-as.data.frame(cbind("beta"=theta2b,
                               "se"=se2b)) %>%
   mutate(lcl = beta - 1.96*se,
-         ucl = beta + 1.95*se)
+         ucl = beta + 1.96*se)
 
 row.names(ests_2b) <- c(intlist[1],intlist[3],"risk1","risk0","rd","lnrr")
 
@@ -263,15 +263,10 @@ geex_ef3 <- function(data){
   w <- data$w
   
   function(theta){
-    nu <- theta[1]
-    gamma <- theta[2]
-    eta <- theta[3]
-    psi <- theta[4]
-    
-    ef_1 <- r*(w - nu)
-    ef_2 <- (1 - r)*y*(w - gamma)
-    ef_3 <- (1 - r)*(1 - y)*((1 - w) - eta)
-    ef_4 <- psi*(gamma - (1 - eta)) - (nu - (1 - eta))
+    ef_1 <- r*(w - theta[1])
+    ef_2 <- (1 - r)*y*(w - theta[2])
+    ef_3 <- (1 - r)*(1 - y)*((1 - w) - theta[3])
+    ef_4 <- theta[4]*(theta[2] - (1 - theta[3])) - (theta[1] - (1 - theta[3]))
 
     return(c(ef_1,ef_2,ef_3,ef_4))
   }
